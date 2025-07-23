@@ -7,7 +7,7 @@ locals {
 }
 
 resource "aws_security_group" "jenkins_sg" {
-  name        = "${local.name}-bastion-sg"
+  name        = "${local.name}-jenkins-sg"
   description = "Security group for jenkins server"
   vpc_id      = var.vpc_id
   ingress {
@@ -17,20 +17,27 @@ resource "aws_security_group" "jenkins_sg" {
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
 
-    ingress {
+  ingress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
 
-      ingress {
-    description = "Allow sonar to access jenkins for quality gates result"
+    ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [ aws_security_group.sonar_sg.id ]
+    cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
+
+  # ingress {
+  #   description     = "Allow sonar to access jenkins for quality gates result"
+  #   from_port       = 80
+  #   to_port         = 80
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.sonar_sg.id]
+  # }
 
   egress {
     from_port   = 0
@@ -52,19 +59,19 @@ resource "aws_security_group" "nexus_sg" {
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
 
-    ingress {
+  ingress {
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
 
-    ingress {
-      description = "Allow Jenkins to upload artifacts"
-    from_port   = 8081
-    to_port     = 8081
-    protocol    = "tcp"
-    security_groups = [ aws_security_group.jenkins_sg.id ]
+  ingress {
+    description     = "Allow Jenkins to upload artifacts"
+    from_port       = 8081
+    to_port         = 8081
+    protocol        = "tcp"
+    security_groups = [aws_security_group.jenkins_sg.id]
   }
 
 
@@ -88,18 +95,18 @@ resource "aws_security_group" "sonar_sg" {
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
 
-    ingress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
-    ingress {
-      description = "Allow Jenkins to upload sonar server reports"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    security_groups = [ aws_security_group.jenkins_sg.id ]
+  ingress {
+    description     = "Allow Jenkins to upload sonar server reports"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.jenkins_sg.id]
   }
 
 

@@ -54,10 +54,7 @@ variable "instance_type" {
   type        = string
 }
 
-variable "instance_type_bastion" {
-  description = "EC2 instance type"
-  type        = string
-}
+
 
 variable "domain_name" {
   description = "Domain Name"
@@ -73,7 +70,7 @@ variable "bucket_artifact_storage" {
 
 
 variable "root_domain_name" {
-  type    = string
+  type = string
 }
 
 # variable "record" {

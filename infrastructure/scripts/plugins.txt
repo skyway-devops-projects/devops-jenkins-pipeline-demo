@@ -1,0 +1,9 @@
+git
+workflow-aggregator
+blueocean
+job-dsl
+dependency-check-jenkins-plugin
+sonar:2.18
+nodejs:1.6.4
+docker-plugin:1.10.0
+docker-workflow:621.va_73f881d9232
