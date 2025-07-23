@@ -40,6 +40,16 @@ resource "aws_instance" "jenkins" {
   tags            = merge(local.common_tags, { Name = "${local.name}-Jenkins-Serever" })
 }
 
+resource "aws_instance" "nexus" {
+  ami             = "ami-013f478ef10960da1"
+  instance_type   = var.instance_type
+  subnet_id       = element(module.vpc.public_subnet_ids, 1)
+  security_groups = [ module.security.nexus_security_group_id ]
+  key_name        = var.key_name
+  user_data       = templatefile("${path.module}/scripts/nexus-ubuntu.sh", {})
+  tags            = merge(local.common_tags, { Name = "${local.name}-nexus-Serever" })
+}
+
 data "aws_route53_zone" "selected_zone" {
   name         =var.root_domain_name
   private_zone = false
@@ -52,3 +62,12 @@ resource "aws_route53_record" "route53_A_record" {
   ttl = 300
   records = [aws_instance.jenkins.public_ip]
 }
+
+resource "aws_route53_record" "route53_A_record_nexus" {
+  zone_id = data.aws_route53_zone.selected_zone.zone_id
+  name    = "nexus.${var.root_domain_name}"
+  type    = "A"
+  ttl = 300
+  records = [aws_instance.nexus.public_ip]
+}
+

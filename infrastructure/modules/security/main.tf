@@ -66,10 +66,17 @@ resource "aws_security_group" "nexus_sg" {
     cidr_blocks = [var.allowed_ssh_cidr_blocks]
   }
 
+   ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.allowed_ssh_cidr_blocks]
+  }
+
   ingress {
     description     = "Allow Jenkins to upload artifacts"
-    from_port       = 8081
-    to_port         = 8081
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.jenkins_sg.id]
   }
