@@ -1,36 +1,20 @@
 #!/bin/bash
 
-# Update system
-sudo apt update -y && apt upgrade -y
+sudo apt update -y
 
-# Install Java (Nexus requires Java 8 or 11)
-sudo apt install openjdk-8-jdk nginx curl gnupg2  -y
+sudo apt install openjdk-17-jdk nginx curl gnupg2  -y
 
-# Create nexus user
-sudo useradd -M -d /opt/nexus -s /bin/false nexus
+sudo useradd -d /opt/nexus -s /bin/bash nexus
 
-# Create required directories
-sudo mkdir -p /opt/nexus /opt/sonatype-work
-
-# Download Nexus (change version as needed)
 cd /opt
-NEXUS_VERSION=3.45.0-01 
-sudo wget https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-${NEXUS_VERSION}-unix.tar.gz
-
-
-# Extract and rename
-sudo tar -xvzf nexus-${NEXUS_VERSION}-unix.tar.gz
-sudo cp -r /opt/nexus-${NEXUS_VERSION}/* /opt/nexus/
-sudo rm nexus-${NEXUS_VERSION}-unix.tar.gz
-
-# Set permissions
+sudo wget https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
+sudo tar xzf nexus-3.82.0-08-linux-x86_64.tar.gz
+sudo mv nexus-3.82.0-08  /opt/nexus
+sudo mv sonatype-work /opt/sonatype-work
 sudo chown -R nexus:nexus /opt/nexus /opt/sonatype-work
-
-# Configure Nexus to run as nexus user
 echo 'run_as_user="nexus"' | sudo tee /opt/nexus/bin/nexus.rc > /dev/null
-
-
 ###
+
 sudo tee /etc/systemd/system/nexus.service > /dev/null <<EOF
 [Unit]
 Description=Nexus Repository Manager
@@ -47,13 +31,11 @@ Restart=on-abort
 [Install]
 WantedBy=multi-user.target
 EOF
-
 # Enable and start Nexus
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable nexus
 sudo systemctl start nexus
-
 
 ###
 sudo tee /etc/nginx/sites-available/jenkins > /dev/null <<EOF
@@ -77,11 +59,4 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 
-
-# Firewall (optional, if ufw is used)
-# ufw allow 8081
-
-# Echo default admin password
-# echo "Waiting for Nexus to initialize..."
-# sleep 60
-# cat /opt/sonatype-work/nexus3/admin.password > /root/nexus-admin-password.txt
+#cat /opt/sonatype-work/nexus3/admin.password
