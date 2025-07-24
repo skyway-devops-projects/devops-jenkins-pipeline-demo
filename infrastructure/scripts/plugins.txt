@@ -7,3 +7,9 @@ sonar:2.18
 nodejs:1.6.4
 docker-plugin:1.10.0
 docker-workflow:621.va_73f881d9232
+slack:761.v2a_8770f0d169
+sonar-quality-gates:352.vdcdb_d7994fb_6
+nexus-artifact-uploader:2.14
+copyartifact:770.va_6c69e063442
+zentimestamp:4.2
+build-pipeline-plugin:2.0.2
